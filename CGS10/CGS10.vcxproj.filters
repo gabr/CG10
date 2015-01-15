@@ -25,6 +25,8 @@
     <None Include="sun_FS.glsl" />
     <None Include="sun_VS.glsl" />
     <None Include="data\shuttle.off" />
+    <None Include="RT_VS.glsl" />
+    <None Include="RT_FS.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
@@ -36,11 +38,6 @@
     <ClInclude Include="offLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="part8.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\background.jpg">
@@ -64,5 +61,10 @@
     <Image Include="data\saturn.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="part10.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

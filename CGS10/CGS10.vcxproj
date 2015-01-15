@@ -52,10 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\studia\erlangen\sem5\CG\LaborkiProgramowanie\A10\CGS10\CGS10\msvc2013_opengl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>E:\studia\erlangen\sem5\CG\LaborkiProgramowanie\A10\CGS10\CGS10\msvc2013_opengl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,6 +86,8 @@
     <None Include="data\shuttle.off" />
     <None Include="Light_and_Tex_FS.glsl" />
     <None Include="Light_and_Tex_VS.glsl" />
+    <None Include="RT_FS.glsl" />
+    <None Include="RT_VS.glsl" />
     <None Include="shuttle.off" />
     <None Include="sun_FS.glsl" />
     <None Include="sun_VS.glsl" />
@@ -93,7 +98,7 @@
     <ClInclude Include="offLoader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="part8.cpp" />
+    <ClCompile Include="part10.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\background.jpg" />
