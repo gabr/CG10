@@ -51,7 +51,23 @@ const SceneIntersectionTestResult noSceneIntersection = SceneIntersectionTestRes
 IntersectionTestResult intersectRaySphere(Ray ray, vec4 sphereData) {
 	// TODO: a) Ray-Sphere-Intersection
 	// Implement a ray sphere intersection test here
-	return noIntersection;
+
+    vec3 point = sphereData.xyz;
+    vec3 vectorToPoint = point - ray.origin;
+
+    float distance = length(vectorToPoint);
+    
+    vectorToPoint = normalize(vectorToPoint);
+    vec3 normalizedRay = normalize(ray.direction);
+
+    bool intersect = false;
+
+    if (vectorToPoint == normalizedRay)
+        intersect = true;
+
+    IntersectionTestResult result = IntersectionTestResult(intersect, distance);
+
+	return result;;
 }
 
 // Ray plane intersection test
@@ -73,7 +89,7 @@ vec3 getNormal(int objectId, vec3 hitPosition) {
 // Returns the closest intersection of the ray with the scene
 SceneIntersectionTestResult intersectRayScene(Ray ray) {
 	// Dummy scene intersection - you have to remove this
-//--- DUMMY BEGIN END ---
+//--- DUMMY CODE BEGIN ---
 	IntersectionTestResult result = intersectRayPlane(ray, vec4(0,1,0,-30));
 	// No intersection occurred
 	if (!result.isIntersection)

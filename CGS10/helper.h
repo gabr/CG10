@@ -173,8 +173,8 @@ inline vec3 operator*(float a, vec3 b)
     // get pointer to associated buffer object
     pbuf_VS=filestr_VS.rdbuf();
     pbuf_FS=filestr_FS.rdbuf();
-    size_VS=pbuf_VS->pubseekoff (0,ios::end,ios::in);
-    size_FS=pbuf_FS->pubseekoff(0,ios::end,ios::in);
+    size_VS = (int)pbuf_VS->pubseekoff(0, ios::end, ios::in);
+    size_FS = (int)pbuf_FS->pubseekoff(0, ios::end, ios::in);
     
     pbuf_VS->pubseekpos (0,ios::in);
     pbuf_FS->pubseekpos (0,ios::in);
@@ -201,8 +201,10 @@ inline vec3 operator*(float a, vec3 b)
       glGetShaderInfoLog(Vshader, sizeof(infoLog), &infoLogLength, infoLog);
       if(infoLogLength > 0)
       {
-	printf("CompileShader() infoLog for Vertex Shader %s \n%s\n",VSfile, infoLog);
-	exit(1);
+          printf("CompileShader() infoLog for Vertex Shader %s \n%s\n", VSfile, infoLog);
+          *handle = -1;
+          return;
+	      // exit(1);
       }
     }	
 
@@ -216,8 +218,10 @@ inline vec3 operator*(float a, vec3 b)
       glGetShaderInfoLog(Fshader, sizeof(infoLog), &infoLogLength, infoLog);
       if(infoLogLength > 0)
       {
-	printf("CompileShader() infoLog for Fragment Shader %s\n%s\n", FSfile, infoLog);
-	exit(1);
+          printf("CompileShader() infoLog for Fragment Shader %s\n%s\n", FSfile, infoLog);
+          *handle = -1;
+          return;
+          //exit(1);
       }
     }	
 
@@ -235,53 +239,62 @@ inline vec3 operator*(float a, vec3 b)
 
 // this function creates Shader Program which consists only of a vertex shader
 
-  void createProgram_V(const char *VSfile, GLuint *handle) {
-    
-    GLint compiled;
-    char infoLog[4096];
-    int infoLogLength;
-    
-    filebuf *pbuf;
-    ifstream filestr;
-    int size;
-    char *buffer;
-    
-    filestr.open(VSfile);
-    
-    // get pointer to associated buffer object
-    pbuf=filestr.rdbuf();
-    size=pbuf->pubseekoff (0,ios::end,ios::in);
-    pbuf->pubseekpos (0,ios::in);
-    
-    // allocate memory to contain file data
-    buffer=new char[size];
-    pbuf->sgetn(buffer,size);
-    
-    const char *VshaderCode = buffer;
-    
-    filestr.close();
-    
-    //compile vertex shader: 	
-    GLuint Vshader= glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(Vshader,1,&VshaderCode,&size);
-    glCompileShader(Vshader);
-    glGetShaderiv(Vshader,GL_COMPILE_STATUS, &compiled);
-    if ( !compiled) {
-      // Print out the info log
-      glGetShaderInfoLog(Vshader, sizeof(infoLog), &infoLogLength, infoLog);
-      if(infoLogLength > 0)
+  void createProgram_VF_string(const string VScode, const string FScode, GLuint *handle)
+  {
+      GLint compiled;
+      char infoLog[4096];
+      int infoLogLength;
+
+      int size_VS, size_FS;
+
+      // get pointer to associated buffer object
+      size_VS = VScode.length();
+      size_FS = FScode.length();
+
+
+      // allocate memory to contain file data    
+      const char *VshaderCode = VScode.c_str();
+      const char *FshaderCode = FScode.c_str();
+
+      //compile vertex shader: 	
+      GLuint Vshader = glCreateShader(GL_VERTEX_SHADER);
+      glShaderSource(Vshader, 1, &VshaderCode, &size_VS);
+      glCompileShader(Vshader);
+      glGetShaderiv(Vshader, GL_COMPILE_STATUS, &compiled);
+      if (!compiled)
       {
-	printf("CompileShader() infoLog %s \n%s\n",VSfile, infoLog);
-	exit(1);
+          // Print out the info log
+          glGetShaderInfoLog(Vshader, sizeof(infoLog), &infoLogLength, infoLog);
+          if (infoLogLength > 0)
+          {
+              printf("CompileShader() infoLog for Vertex Shader \n%s\n", infoLog);
+          }
       }
-    }	
-    
-    *handle = glCreateProgram();
-    glAttachShader(*handle, Vshader);
-    
-    glDeleteShader(Vshader);
-    delete buffer;
-    glLinkProgram(*handle);
+
+      //compile Fragment shader: 	
+      GLuint Fshader = glCreateShader(GL_FRAGMENT_SHADER);
+      glShaderSource(Fshader, 1, &FshaderCode, &size_FS);
+      glCompileShader(Fshader);
+      glGetShaderiv(Fshader, GL_COMPILE_STATUS, &compiled);
+      if (!compiled)
+      {
+          // Print out the info log
+          glGetShaderInfoLog(Fshader, sizeof(infoLog), &infoLogLength, infoLog);
+          if (infoLogLength > 0)
+          {
+              printf("CompileShader() infoLog for Fragment Shader \n%s\n", infoLog);
+          }
+      }
+
+      *handle = glCreateProgram();
+      glAttachShader(*handle, Vshader);
+      glAttachShader(*handle, Fshader);
+
+
+      glDeleteShader(Vshader);
+      glDeleteShader(Fshader);
+
+      glLinkProgram(*handle);
   }
 
 #endif
