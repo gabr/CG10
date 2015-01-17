@@ -258,6 +258,17 @@ void main() {
 
 	// TODO: d) Reflections
 	// TODO: Compute reflections for sun & earth
-	Ray reflectionRay = primaryRay;
 
+    if(r.objectId != 0 && r.objectId != 1)
+        return;
+
+	Ray reflectionRay = primaryRay;
+	reflectionRay = Ray(r.hitPosition, r.normal);
+    r = intersectRayScene(reflectionRay);
+
+    if (r.objectId == -1) {
+		return;
+	}
+
+    gl_FragColor = getColor(r, reflectionRay);
 }
