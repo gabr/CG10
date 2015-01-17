@@ -58,6 +58,10 @@ IntersectionTestResult intersectRaySphere(Ray ray, vec4 sphereData) {
     float lengthL = length(l);
 
     float cosa = dot(ray.direction, l) / (lengthR * lengthL);
+
+    if (cosa < 0)
+        return noIntersection;
+
     float sina = sqrt(1.0 - (cosa * cosa));
 
     float x = sina * lengthL;
@@ -134,7 +138,7 @@ SceneIntersectionTestResult intersectRayScene(Ray ray) {
     
     for (int i = minIndex + 1; i < NUM_MAX_INTERSECTIONS; i++)
     {
-        if (results[i].tHit < results[minIndex].tHit && results[i].isIntersection)
+        if ((results[i].tHit*results[i].tHit) < (results[minIndex].tHit*results[minIndex].tHit) && results[i].isIntersection)
         {
             minIndex = i;
         }
