@@ -51,23 +51,27 @@ const SceneIntersectionTestResult noSceneIntersection = SceneIntersectionTestRes
 IntersectionTestResult intersectRaySphere(Ray ray, vec4 sphereData) {
 	// TODO: a) Ray-Sphere-Intersection
 	// Implement a ray sphere intersection test here
-
-    vec3 point = sphereData.xyz;
-    vec3 vectorToPoint = point - ray.origin;
-
-    float distance = length(vectorToPoint);
     
-    vectorToPoint = normalize(vectorToPoint);
-    vec3 normalizedRay = normalize(ray.direction);
+    vec3 l = sphereData.xyz - ray.origin;
 
-    bool intersect = false;
+    float lengthR = length(ray.direction);
+    float lengthL = length(l);
 
-    if (vectorToPoint == normalizedRay)
-        intersect = true;
+    float cosa = dot(ray.direction, l) / (lengthR * lengthL);
+    float sina = sqrt(1.0 - (cosa * cosa));
 
-    IntersectionTestResult result = IntersectionTestResult(intersect, distance);
+    float x = sina * lengthL;
 
-	return result;;
+    float r = sphereData.w;
+    if (x <= r)
+    {
+        float y = sqrt((sphereData.w * sphereData.w) - (x*x));
+        float g = sqrt((lengthL*lengthL) - (x*x));
+        
+        return IntersectionTestResult(true, g-y);
+    }
+
+    return noIntersection;
 }
 
 // Ray plane intersection test
@@ -90,34 +94,64 @@ vec3 getNormal(int objectId, vec3 hitPosition) {
 SceneIntersectionTestResult intersectRayScene(Ray ray) {
 	// Dummy scene intersection - you have to remove this
 //--- DUMMY CODE BEGIN ---
-	IntersectionTestResult result = intersectRayPlane(ray, vec4(0,1,0,-30));
-	// No intersection occurred
-	if (!result.isIntersection)
-		return noSceneIntersection;
-	// Compute normal and the position of the intersection
-	vec3 hitPosition = ray.origin + result.tHit * ray.direction;
-	vec3 normal = getNormal(OBJ_ID_GROUND_PLANE, hitPosition);
-	
-	// Epsilon correction for the hitposition
-	hitPosition += normal * EPSILON;
-	return SceneIntersectionTestResult(result, OBJ_ID_GROUND_PLANE, normal, hitPosition);
+	// IntersectionTestResult result = intersectRayPlane(ray, vec4(0,1,0,-30));
+	// // No intersection occurred
+	// if (!result.isIntersection)
+	// 	return noSceneIntersection;
+	// // Compute normal and the position of the intersection
+	// vec3 hitPosition = ray.origin + result.tHit * ray.direction;
+	// vec3 normal = getNormal(OBJ_ID_GROUND_PLANE, hitPosition);
+	// 
+	// // Epsilon correction for the hitposition
+	// hitPosition += normal * EPSILON;
+	// return SceneIntersectionTestResult(result, OBJ_ID_GROUND_PLANE, normal, hitPosition);
 //--- DUMMY CODE END ---
 	// TODO: b) Ray-Scene-Intersection
 	// TODO: Rewrite your code here
 	// TODO: Perform intersection tests
-	////IntersectionTestResult results[NUM_MAX_INTERSECTIONS];
-	// For all spheres
+    IntersectionTestResult results[NUM_MAX_INTERSECTIONS];
+    // For all spheres
+    for (int i = 0; i < NUM_SPHERES; i++)
+        results[i] = intersectRaySphere(ray, uSphereData[i]);
+    
+    // For the ground plane
+    results[NUM_SPHERES] = intersectRayPlane(ray, vec4(0,1,0,-30));
+    
+    // Find the closest intersection along the ray
+    int minIndex = -1;
+    
+    for (int i = 0; i < NUM_MAX_INTERSECTIONS; i++)
+    {
+        if (results[i].isIntersection)
+        {
+            minIndex = i;
+            break;
+        }
+    }
 
-	// For the ground plane
-
-	// Find the closest intersection along the ray
-	
-	// Compute normal and the position of the intersection
-	
-	// Epsilon correction for the hitposition
-	
-	// Return the closest intersection
-	
+    if (minIndex == -1)
+        return noSceneIntersection;
+    
+    for (int i = minIndex + 1; i < NUM_MAX_INTERSECTIONS; i++)
+    {
+        if (results[i].tHit < results[minIndex].tHit && results[i].isIntersection)
+        {
+            minIndex = i;
+        }
+    }
+    
+    if (!results[minIndex].isIntersection)
+        return noSceneIntersection;
+    
+    // Compute normal and the position of the intersection
+    vec3 hitPosition = ray.origin + results[minIndex].tHit * ray.direction;
+    vec3 normal = getNormal(minIndex, hitPosition);
+    
+    // Epsilon correction for the hitposition
+    hitPosition += normal * EPSILON;
+    
+    // Return the closest intersection
+    return SceneIntersectionTestResult(results[minIndex], minIndex, normal, hitPosition);
 }
 
 // Shadow ray intersection test
