@@ -217,7 +217,12 @@ vec4 getColor(SceneIntersectionTestResult result, Ray ray) {
 	color += pow(max(dot(result.normal ,normalize(toLightP - ray.direction)), 0), 40.);
 
 	if (result.objectId == OBJ_ID_GROUND_PLANE)
+    {
 		color *= (smoothCheckerboard(result.hitPosition.xz*0.1)*.5+.5);
+        Ray lightRay = Ray(result.hitPosition, toLightP);
+        if (intersectRaySceneShadow(lightRay))
+            color *= 0.75;
+    }
 
 	// TODO: c) Shadow-Test
 	// Implement a shadow test here (the direction to the lightsource is toLightP)
