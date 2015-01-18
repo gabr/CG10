@@ -263,7 +263,8 @@ void main() {
         return;
 
 	Ray reflectionRay = primaryRay;
-	reflectionRay = Ray(r.hitPosition, r.normal);
+    vec3 deflected = (2 * dot(r.normal, -primaryRay.direction) * r.normal) + primaryRay.direction;
+	reflectionRay = Ray(r.hitPosition, deflected);
     r = intersectRayScene(reflectionRay);
 
     if (r.objectId == -1) {
